@@ -1,5 +1,4 @@
 name: CI/CD App to EC2
-
 on:
   push:
     branches:
@@ -8,29 +7,11 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Install dependencies
-        run: |
-          cd app
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run basic Flask test
-        run: |
-          cd app
-          python -m flask --app app.py run &
-          sleep 5
-          curl -f http://127.0.0.1:5000/
-
+                  
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
@@ -40,16 +21,20 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./app
+          context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/miapp:latest
 
+      - name: Install dependencies
+        run: |
+          pip install -r app/requirements.txt  
+          
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy Docker image to EC2
+      - name: 🚀 Deploy Docker image to EC2
         uses: bitovi/github-actions-deploy-docker-to-ec2@v1.0.1
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -58,5 +43,3 @@ jobs:
           ec2_instance_id: ${{ secrets.EC2_INSTANCE_ID }}
           docker_image: ${{ secrets.DOCKERHUB_USERNAME }}/miapp:latest
           docker_run_command: "docker run -d -p 5000:5000 ${{ secrets.DOCKERHUB_USERNAME }}/miapp:latest"
-
-

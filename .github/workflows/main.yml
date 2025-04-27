@@ -30,9 +30,10 @@ jobs:
     steps:
       - name: AWS Credentials Configure
         env:
+          aws-region: us-east-2
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+          role-to-assume: arn:aws:iam::123456789012:role/GitHubActionsRole
 
       - name: Deploy Docker container using SSM
         run: |

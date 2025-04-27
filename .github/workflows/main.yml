@@ -28,15 +28,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: AWS Credentials Configure
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Test AWS Connection
-        run: aws sts get-caller-identity 
+          aws-region: us-east-1
 
       - name: Deploy Docker container using SSM
         run: |

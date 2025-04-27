@@ -31,14 +31,17 @@ jobs:
       - name: AWS Credentials Configure
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: us-east-2
+          aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          role-to-assume: arn:aws:iam::123456789012:role/GitHubActionsRole
 
       - name: Deploy Docker container using SSM
         run: |
           aws ssm send-command \
             --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
-            --parameters 'commands=["docker run -p 5000:5000 test-image"]'
+            --parameters 'commands=[
+              "docker stop $(docker ps -q) || true",
+              "docker rm $(docker ps -aq) || true",
+              "docker run -d -p 5000:5000 --name my-app ./app"
+            ]'

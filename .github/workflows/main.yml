@@ -29,7 +29,6 @@ jobs:
 
     steps:
       - name: Configure AWS Credentials
-        uses: Zapoye18/github-actions-deploy-docker-to-ec2@v1.0.1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
